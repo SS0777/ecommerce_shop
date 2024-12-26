@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}프로필{% endblock %}
+
+{% block content %}
+  <div class="container">
+    <h2>프로필</h2>
+    <form method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+      {{ form.as_p }}  <!-- form을 <p>태그로 출력 -->
+      <button type="submit" class="btn btn-primary">저장</button>
+    </form>
+  </div>
+{% endblock %}

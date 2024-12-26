@@ -7,6 +7,7 @@ from django.views.generic.edit import CreateView
 from django.urls import reverse_lazy
 from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
+from django.contrib.auth.views import LoginView as DjangoLoginView, LogoutView as DjangoLogoutView
 from .models import User
 
 
@@ -25,6 +26,15 @@ class SignUpView(CreateView):
         login(self.request, user)
         return response
 
+
+class LoginView(DjangoLoginView):  # 로그인 뷰 추가
+    template_name = 'accounts/login.html'  # 로그인에 사용할 템플릿
+    # 기본적으로 'registration/login.html' 템플릿을 사용하지만, 'accounts/login.html'을 사용하려면
+    # 이렇게 명시적으로 템플릿을 지정해야 합니다.
+
+class LogoutView(DjangoLogoutView):  # 로그아웃 뷰 추가
+    next_page = reverse_lazy('login')  # 로그아웃 후 리디렉션할 URL, 로그인 페이지로 리디렉션
+
 @login_required
 def profile_view(request):
     if request.method == 'POST':
@@ -41,6 +51,7 @@ def profile_view(request):
         'reviews': request.user.review_set.all()[:5]
     }
     return render(request, 'accounts/profile.html', context)
+
 
 @login_required
 def follow_toggle(request, user_id):

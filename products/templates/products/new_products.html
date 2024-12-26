@@ -1,0 +1,21 @@
+<!-- products/new_products.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>신규 제품</h1>
+
+    {% if new_products %}
+        <ul>
+            {% for product in new_products %}
+                <li>
+                    <h2>{{ product.name }}</h2>
+                    <p>{{ product.description }}</p>
+                    <p>가격: {{ product.price }}</p>
+                    <p>등록일: {{ product.created_at|date:"Y-m-d" }}</p>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>{{ no_data_message }}</p>
+    {% endif %}
+{% endblock %}

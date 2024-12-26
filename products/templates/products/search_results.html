@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>검색 결과: "{{ query }}"</h2>
+
+  {% if products %}
+    <ul>
+      {% for product in products %}
+        <li>{{ product.name }} - {{ product.price }}원</li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>검색 결과가 없습니다.</p>
+  {% endif %}
+{% endblock %}
