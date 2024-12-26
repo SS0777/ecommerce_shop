@@ -1,0 +1,212 @@
+{% extends 'base.html' %}
+
+{% load humanize %}
+
+{% block title %}Shop - 홈{% endblock %}
+
+{% block content %}
+<!-- 히어로 섹션 -->
+<div class="bg-light p-5 rounded-lg mb-4">
+    <h1 class="display-4">Welcome to Shop</h1>
+    <p class="lead">최고의 상품을 최저가로 만나보세요.</p>
+    <hr class="my-4">
+    <form class="d-flex w-50 mb-3" method="GET" action="{% url 'products:search' %}">
+        <input class="form-control me-2" type="search" name="q" placeholder="찾으시는 상품이 있나요?" aria-label="Search">
+        <button class="btn btn-primary" type="submit">검색</button>
+    </form>
+</div>
+
+<!-- 카테고리 퀵링크 -->
+<section class="mb-5">
+    <div class="row">
+        {% for category in featured_categories %}
+        <div class="col-md-2 col-6 mb-3 text-center">
+            <a href="{% url 'products:category' category.slug %}" class="text-decoration-none">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <i class="{{ category.icon_class }} fa-2x mb-2"></i>
+                        <h6 class="card-title mb-0">{{ category.name }}</h6>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- 인기 상품 섹션 -->
+<section class="mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>인기 상품</h2>
+        <a href="{% url 'products:popular' %}" class="btn btn-outline-primary">더보기</a>
+    </div>
+    <div class="row">
+        {% for product in popular_products %}
+        <div class="col-md-3 col-6 mb-4">
+            <div class="card h-100">
+                <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h5 class="card-title mb-0">{{ product.name }}</h5>
+                        <button class="btn btn-link p-0 toggle-wishlist" data-product-id="{{ product.id }}">
+                            <i class="fas fa-heart {% if product in user.wishlist.products.all %}text-danger{% endif %}"></i>
+                        </button>
+                    </div>
+                    <div class="review-stars mb-2">
+                        {% with ''|center:product.average_rating as range %}
+                        {% for _ in range %}
+                        <i class="fas fa-star"></i>
+                        {% endfor %}
+                        {% endwith %}
+                        <span class="text-muted">({{ product.review_count }})</span>
+                    </div>
+                    <p class="card-text text-danger mb-2">{{ product.price|intcomma }}원</p>
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-primary add-to-cart" data-product-id="{{ product.id }}">
+                            장바구니 담기
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- 신상품 섹션 -->
+<section class="mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>신상품</h2>
+        <a href="{% url 'products:new' %}" class="btn btn-outline-primary">더보기</a>
+    </div>
+    <div class="row">
+        {% for product in new_products %}
+        <div class="col-md-3 col-6 mb-4">
+            <div class="card h-100">
+                <div class="position-absolute top-0 end-0 p-2">
+                    <span class="badge bg-danger">NEW</span>
+                </div>
+                <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h5 class="card-title mb-0">{{ product.name }}</h5>
+                        <button class="btn btn-link p-0 toggle-wishlist" data-product-id="{{ product.id }}">
+                            <i class="fas fa-heart {% if product in user.wishlist.products.all %}text-danger{% endif %}"></i>
+                        </button>
+                    </div>
+                    <p class="card-text text-danger mb-2">{{ product.price|intcomma }}원</p>
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-primary add-to-cart" data-product-id="{{ product.id }}">
+                            장바구니 담기
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="mb-5">
+    <h2 class="mb-4">베스트 리뷰</h2>
+    <div class="row">
+        {% for review in best_reviews %}
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <img src="{{ review.user.profile_image.url }}" class="rounded-circle me-2" width="40" height="40" alt="프로필">
+                        <div>
+                            <h6 class="mb-0">{{ review.user.username }}</h6>
+                            <div class="review-stars">
+                                {% with ''|center:review.rating as range %}
+                                {% for _ in range %}
+                                <i class="fas fa-star"></i>
+                                {% endfor %}
+                                {% endwith %}
+                            </div>
+                        </div>
+                    </div>
+                    <h5 class="card-title">{{ review.product.name }}</h5>
+                    <p class="card-text">{{ review.content }}</p>
+                    {% if review.image %}
+                    <img src="{{ review.image.url }}" class="img-fluid rounded mb-2" alt="리뷰 이미지">
+                    {% endif %}
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">{{ review.created_at|date:"Y.m.d" }}</small>
+                        <button class="btn btn-sm btn-outline-primary view-review" data-review-id="{{ review.id }}">
+                            자세히 보기
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- 이벤트/프로모션 섹션 -->
+<section class="mb-5">
+    <h2 class="mb-4">진행중인 이벤트</h2>
+    <div class="row">
+        {% for event in events %}
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <img src="{{ event.image.url }}" class="card-img-top" alt="{{ event.title }}">
+                <div class="card-body">
+                    <h5 class="card-title">{{ event.title }}</h5>
+                    <p class="card-text">{{ event.description }}</p>
+                    <p class="text-muted">
+                        {{ event.start_date|date:"Y.m.d" }} ~ {{ event.end_date|date:"Y.m.d" }}
+                    </p>
+                    <a href="{% url 'events:detail' event.id %}" class="btn btn-outline-primary">자세히 보기</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // 찜하기 토글
+    $('.toggle-wishlist').click(function(e) {
+        e.preventDefault();
+        const productId = $(this).data('product-id');
+        const heartIcon = $(this).find('i');
+        
+        $.post('/products/toggle-wishlist/' + productId + '/', function(data) {
+            if (data.is_wished) {
+                heartIcon.addClass('text-danger');
+            } else {
+                heartIcon.removeClass('text-danger');
+            }
+        });
+    });
+
+    // 장바구니 담기
+    $('.add-to-cart').click(function(e) {
+        e.preventDefault();
+        const productId = $(this).data('product-id');
+        
+        $.post('/orders/add-to-cart/' + productId + '/', function(data) {
+            if (data.success) {
+                // 장바구니 아이콘 카운트 업데이트
+                $('.cart-count').text(data.cart_count);
+                // 알림 표시
+                alert('장바구니에 추가되었습니다.');
+            }
+        });
+    });
+
+    // 리뷰 상세보기
+    $('.view-review').click(function(e) {
+        e.preventDefault();
+        const reviewId = $(this).data('review-id');
+        window.location.href = '/reviews/' + reviewId + '/';
+    });
+});
+</script>
+{% endblock %}
