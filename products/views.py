@@ -105,3 +105,7 @@ class NewProductsView(ListView):
         if not context['new_products']:
             context['no_data_message'] = "현재 새로운 제품이 없습니다."
         return context
+    
+def wishlist_view(request):
+    # 찜목록 뷰의 로직 구현
+    return render(request, 'products/wishlist.html')  # 해당 템플릿을 렌더링

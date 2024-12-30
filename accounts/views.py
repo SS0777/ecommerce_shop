@@ -2,12 +2,12 @@ from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.views.generic import UpdateView
-from .forms import SignUpForm, ProfileUpdateForm
 from django.views.generic.edit import CreateView
 from django.urls import reverse_lazy
 from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
 from django.contrib.auth.views import LoginView as DjangoLoginView, LogoutView as DjangoLogoutView
+from .forms import SignUpForm, ProfileUpdateForm, LoginForm  # LoginForm 추가
 from .models import User
 
 
@@ -15,25 +15,60 @@ class SignUpView(CreateView):
     model = User
     form_class = SignUpForm
     template_name = 'accounts/signup.html'
-    success_url = reverse_lazy('login')
+    success_url = reverse_lazy('accounts:login')
 
     def form_valid(self, form):
+        # 폼 데이터 저장
         response = super().form_valid(form)
+        user = self.object  # 생성된 사용자 객체
+        
+        # 판매자인 경우 추가 정보 저장
+        if form.cleaned_data['user_type'] == 'SELLER':
+            user.profile.business_number = form.cleaned_data['business_number']
+            user.profile.store_name = form.cleaned_data['store_name']
+            user.profile.store_description = form.cleaned_data['store_description']
+            user.profile.save()
+        
+        # 로그인 처리
         user = authenticate(
             username=form.cleaned_data['username'],
             password=form.cleaned_data['password1']
         )
-        login(self.request, user)
+        if user:
+            login(self.request, user)
+            
         return response
 
+    def form_invalid(self, form):
+        # 폼 에러 확인을 위한 디버깅 출력
+        print(form.errors)
+        return super().form_invalid(form)
 
-class LoginView(DjangoLoginView):  # 로그인 뷰 추가
-    template_name = 'accounts/login.html'  # 로그인에 사용할 템플릿
-    # 기본적으로 'registration/login.html' 템플릿을 사용하지만, 'accounts/login.html'을 사용하려면
-    # 이렇게 명시적으로 템플릿을 지정해야 합니다.
+
+class LoginView(DjangoLoginView):
+    form_class = LoginForm
+    template_name = 'accounts/login.html'
+    success_url = reverse_lazy('main:home')  # 로그인 성공 후 리다이렉트할 URL
+
+    def get_form_kwargs(self):
+        # get_form_kwargs 메소드에서 request를 폼에 전달
+        kwargs = super().get_form_kwargs()
+        kwargs['request'] = self.request  # request를 폼에 전달
+        return kwargs
+
+    def form_valid(self, form):
+        username = form.cleaned_data.get('username')
+        user_type = form.cleaned_data.get('user_type')
+        user = User.objects.filter(username=username, user_type=user_type).first()
+
+        if user is None:
+            form.add_error(None, '입력하신 회원 유형이 일치하지 않습니다.')
+            return self.form_invalid(form)
+
+        return super().form_valid(form)
 
 class LogoutView(DjangoLogoutView):  # 로그아웃 뷰 추가
-    next_page = reverse_lazy('login')  # 로그아웃 후 리디렉션할 URL, 로그인 페이지로 리디렉션
+    next_page = reverse_lazy('accounts:login')  # 로그아웃 후 리디렉션할 URL, 로그인 페이지로 리디렉션
 
 @login_required
 def profile_view(request):

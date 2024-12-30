@@ -6,6 +6,23 @@ import re
 
 # 사용자 모델 확장
 class User(AbstractUser):
+    # 사용자 유형에 대한 상수 선언
+    BUYER = 'BUYER'
+    SELLER = 'SELLER'
+    
+    USER_TYPE_CHOICES = [
+        (BUYER, '구매자'),
+        (SELLER, '판매자'),
+    ]
+    
+    # user_type 필드
+    user_type = models.CharField(
+        max_length=10, 
+        choices=USER_TYPE_CHOICES,
+        default=BUYER  # 기본값으로 'BUYER' 설정
+    )
+
+    # 나머지 필드들
     groups = models.ManyToManyField(
         'auth.Group',
         related_name='custom_user_set',
@@ -26,18 +43,17 @@ class User(AbstractUser):
     phone_number = models.CharField(max_length=15, null=True, blank=True)
     address = models.TextField(null=True, blank=True)
 
+    # 전화번호 유효성 검사
     def clean_phone_number(self):
-        """전화번호 형식 검증"""
         if self.phone_number:
-            # 전화번호가 숫자만 포함하도록 정규 표현식
             if not re.match(r'^[0-9]{10,15}$', self.phone_number):
                 raise ValueError("전화번호는 10~15자리 숫자만 입력 가능합니다.")
         return self.phone_number
 
+    # 저장 메서드
     def save(self, *args, **kwargs):
-        # 전화번호 유효성 검사
-        self.clean_phone_number()
-        super().save(*args, **kwargs)  # 기본 save 호출
+        self.clean_phone_number()  # 전화번호 유효성 검사
+        super().save(*args, **kwargs)  # 부모 클래스의 save 호출
 
 
 # 프로필 모델
@@ -46,6 +62,10 @@ class Profile(models.Model):
     points = models.PositiveIntegerField(default=0)
     grade = models.CharField(max_length=20, default='BRONZE')
     marketing_agree = models.BooleanField(default=False)
+
+    business_number = models.CharField(max_length=20, null=True, blank=True)
+    store_name = models.CharField(max_length=100, null=True, blank=True)
+    store_description = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.user.username}'s Profile"

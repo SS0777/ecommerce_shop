@@ -64,3 +64,8 @@ def report_review(request, review_id):
         form = ReportForm()
     
     return render(request, 'reviews/report.html', {'form': form, 'review': review})
+
+
+def my_reviews_view(request):
+    # 내 리뷰를 처리하는 로직
+    return render(request, 'reviews/my_reviews.html')

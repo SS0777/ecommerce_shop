@@ -31,6 +31,9 @@ DEBUG = os.getenv("DEBUG")=="True"
 
 ALLOWED_HOSTS = []
 
+LOGIN_REDIRECT_URL = '/'  # 또는 원하는 리다이렉트 경로
+LOGOUT_REDIRECT_URL = 'accounts:login'  # 로그아웃 후 리다이렉트할 경로
+LOGIN_URL = 'accounts:login'  # 로그인 URL 이름
 
 # Application definition
 
@@ -49,6 +52,7 @@ INSTALLED_APPS = [
     'notifications',
     'accounts.apps.AccountsConfig', 
     'reviews',
+    'django_extensions',
 ]
 
 AUTH_USER_MODEL = 'accounts.User'
@@ -98,20 +102,20 @@ DATABASES = {
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
-AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
-]
+# AUTH_PASSWORD_VALIDATORS = [
+#     {
+#         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+#     },
+#     {
+#         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+#     },
+#     {
+#         'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+#     },
+#     {
+#         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+#     },
+# ]
 
 
 # Internationalization

@@ -1,14 +1,23 @@
+<!-- accounts/profile.html -->
 {% extends 'base.html' %}
 
-{% block title %}프로필{% endblock %}
-
 {% block content %}
-  <div class="container">
+<div class="container mt-5">
     <h2>프로필</h2>
-    <form method="POST" enctype="multipart/form-data">
-      {% csrf_token %}
-      {{ form.as_p }}  <!-- form을 <p>태그로 출력 -->
-      <button type="submit" class="btn btn-primary">저장</button>
-    </form>
-  </div>
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">회원 정보</h5>
+            <p class="card-text">회원 유형: {{ user.get_user_type_display }}</p>
+            <p class="card-text">사용자 이름: {{ user.username }}</p>
+            <p class="card-text">이메일: {{ user.email }}</p>
+            {% if user.user_type == 'SELLER' %}
+                <h5 class="mt-4">판매자 정보</h5>
+                <p class="card-text">상점명: {{ user.profile.store_name }}</p>
+                <p class="card-text">사업자 등록번호: {{ user.profile.business_number }}</p>
+                <p class="card-text">상점 소개: {{ user.profile.store_description }}</p>
+            {% endif %}
+        </div>
+    </div>
+    <!-- 나머지 프로필 정보 -->
+</div>
 {% endblock %}
