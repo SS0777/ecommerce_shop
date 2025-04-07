@@ -1,0 +1,40 @@
+{% include "django/forms/widgets/input.html" %}
+<div class="mt-2 image-preview-container"></div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const input = document.getElementById('{{ widget.attrs.id }}');
+    const previewContainer = input.parentElement.querySelector('.image-preview-container');
+    
+    if (input) {
+      input.addEventListener('change', function() {
+        // 기존 미리보기 제거
+        previewContainer.innerHTML = '';
+        
+        // 선택한 파일마다 미리보기 생성
+        for (let i = 0; i < this.files.length; i++) {
+          const file = this.files[i];
+          if (!file.type.startsWith('image/')) continue;
+          
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            const preview = document.createElement('div');
+            preview.className = 'image-preview mt-2';
+            preview.style.display = 'inline-block';
+            preview.style.marginRight = '10px';
+            
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            img.className = 'img-thumbnail';
+            img.style.maxHeight = '100px';
+            
+            preview.appendChild(img);
+            previewContainer.appendChild(preview);
+          };
+          
+          reader.readAsDataURL(file);
+        }
+      });
+    }
+  });
+</script>

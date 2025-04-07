@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>리뷰 신고</h1>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">신고하기</button>
+    </form>
+
+    <h2>신고된 리뷰: {{ review.product.name }}</h2>
+    <p>{{ review.content }}</p>
+{% endblock %}

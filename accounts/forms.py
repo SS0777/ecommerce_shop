@@ -1,9 +1,9 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from .models import User, Profile
 from django.contrib.auth import authenticate
-from django.contrib.auth.forms import AuthenticationForm
 
+# 회원가입 폼
 class SignUpForm(UserCreationForm):
     email = forms.EmailField(required=True)
     phone_number = forms.CharField(max_length=15, required=False)
@@ -62,16 +62,32 @@ class SignUpForm(UserCreationForm):
         
         return cleaned_data  # 이 return은 clean() 메소드 내에 있어야 합니다.
 
-
-
+# 프로필 업데이트 폼
 class ProfileUpdateForm(forms.ModelForm):
     class Meta:
-        model = User
-        fields = (
-            'username', 'email', 'profile_image', 'bio',
-            'phone_number', 'address', 'user_type'
-        )
+        model = Profile
+        fields = ['bio', 'profile_image', 'shipping_address']
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        # user 인스턴스가 존재하고 판매자인 경우에만 추가 필드 추가
+        if self.instance and self.instance.user and self.instance.user.is_seller:
+            self.fields['store_name'] = forms.CharField(required=False)
+            self.fields['store_description'] = forms.CharField(widget=forms.Textarea, required=False)
+
+# 사용자 정보 업데이트 폼
+class UserUpdateForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'phone_number', 'address']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # 추가적인 커스터마이징, 예를 들어 사용자 유형에 따라 필드 수정 가능
+        # 예시: self.fields['username'].widget.attrs['placeholder'] = '사용자 이름'
+        
+# 로그인 폼
 class LoginForm(AuthenticationForm):
     user_type = forms.ChoiceField(
         choices=User.USER_TYPE_CHOICES,

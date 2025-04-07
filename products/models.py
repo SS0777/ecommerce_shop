@@ -1,9 +1,7 @@
 # models.py
 
 from django.db import models
-from django.contrib.auth import get_user_model
-
-User = get_user_model()
+from django.apps import apps  # 순환 임포트 문제를 피하기 위한 apps 모듈 임포트
 
 class Category(models.Model):
     name = models.CharField(max_length=100)
@@ -32,7 +30,7 @@ class Product(models.Model):
         related_name='products_as_additional',
         blank=True
     )
-    likes = models.ManyToManyField(User, related_name='liked_products')
+    likes = models.ManyToManyField('accounts.User', related_name='liked_products')  # 순환 임포트를 피하기 위해 'accounts.User'로 문자열 사용
     is_active = models.BooleanField(default=True)
     is_new = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)

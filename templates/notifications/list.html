@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>알림 목록</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+        }
+        .notification-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .notification-item {
+            background-color: #f9f9f9;
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .notification-item p {
+            margin: 5px 0;
+        }
+        .notification-item .timestamp {
+            font-size: 0.9em;
+            color: #777;
+        }
+        .no-items {
+            text-align: center;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>알림 목록</h1>
+
+    {% if notifications %}
+        <ul class="notification-list">
+            {% for notification in notifications %}
+                <li class="notification-item">
+                    <h3>{{ notification.title }}</h3>
+                    <p>{{ notification.message }}</p>
+                    <p class="timestamp">{{ notification.created_at|date:"Y년 m월 d일 H:i" }}</p>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="no-items">현재 알림이 없습니다.</p>
+    {% endif %}
+</div>
+
+</body>
+</html>

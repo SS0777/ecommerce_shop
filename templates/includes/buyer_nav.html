@@ -1,0 +1,75 @@
+<!-- templates/includes/buyer_nav.html -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'main:home' %}">Shop</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <!-- 검색 폼 -->
+            <form class="d-flex mx-auto" method="GET" action="{% url 'products:search' %}">
+                <input class="form-control me-2" type="search" name="q" placeholder="상품 검색..." aria-label="Search">
+                <button class="btn btn-outline-success" type="submit">검색</button>
+            </form>
+            
+            <ul class="navbar-nav me-auto">
+                <!-- 카테고리 드롭다운 -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="categoryDropdown" role="button" data-bs-toggle="dropdown">
+                        카테고리
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="categoryDropdown">
+                        {% for category in categories %}
+                        <li><a class="dropdown-item" href="{% url 'products:category' category.slug %}">{{ category.name }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </li>
+            </ul>
+
+            <ul class="navbar-nav">
+                <!-- 알림 아이콘 -->
+                <li class="nav-item position-relative">
+                    <a class="nav-link" href="{% url 'notifications:list' %}">
+                        <i class="fas fa-bell"></i>
+                        {% if unread_notifications_count %}
+                        <span class="badge bg-danger notification-badge">{{ unread_notifications_count }}</span>
+                        {% endif %}
+                    </a>
+                </li>
+                <!-- 찜목록 -->
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'products:wishlist' %}">
+                        <i class="fas fa-heart"></i>
+                    </a>
+                </li>
+                <!-- 장바구니 -->
+                <li class="nav-item position-relative">
+                    <a class="nav-link" href="{% url 'orders:cart' %}">
+                        <i class="fas fa-shopping-cart"></i>
+                        {% if cart_items_count %}
+                        <span class="badge bg-primary notification-badge">{{ cart_items_count }}</span>
+                        {% endif %}
+                    </a>
+                </li>
+                <!-- 사용자 메뉴 -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                        {{ user.username }}
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                        <li><a class="dropdown-item" href="{% url 'accounts:profile' %}">프로필</a></li>
+                        <li><a class="dropdown-item" href="{% url 'orders:history' %}">주문내역</a></li>
+                        <li><a class="dropdown-item" href="{% url 'reviews:my-reviews' %}">내 리뷰</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form method="POST" action="{% url 'accounts:logout' %}">
+                                {% csrf_token %}
+                                <button type="submit" class="dropdown-item">로그아웃</button>
+                            </form>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>

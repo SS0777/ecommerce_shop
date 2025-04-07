@@ -1,0 +1,29 @@
+<!-- templates/buyer/profile.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>프로필</h2>
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">회원 정보</h5>
+            <p class="card-text">사용자 이름: {{ user.username }}</p>
+            <p class="card-text">이메일: {{ user.email }}</p>
+            <p class="card-text">연락처: {{ user.phone_number }}</p>
+        </div>
+    </div>
+    
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">주문 내역</h5>
+            {% for order in recent_orders %}
+            <div class="order-item">
+                <p>주문번호: {{ order.order_number }}</p>
+                <p>주문일: {{ order.created_at }}</p>
+                <p>상태: {{ order.get_status_display }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

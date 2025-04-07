@@ -1,0 +1,7 @@
+<!-- orders/templates/orders/history.html -->
+<h1>주문 내역</h1>
+<ul>
+    {% for order in orders %}
+        <li>{{ order.id }} - {{ order.status }} - {{ order.total_amount }}</li>
+    {% endfor %}
+</ul>

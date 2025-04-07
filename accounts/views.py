@@ -7,7 +7,7 @@ from django.urls import reverse_lazy
 from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
 from django.contrib.auth.views import LoginView as DjangoLoginView, LogoutView as DjangoLogoutView
-from .forms import SignUpForm, ProfileUpdateForm, LoginForm  # LoginForm 추가
+from .forms import SignUpForm, ProfileUpdateForm, LoginForm, UserUpdateForm  # UserUpdateForm 임포트 추가
 from .models import User
 
 
@@ -73,19 +73,28 @@ class LogoutView(DjangoLogoutView):  # 로그아웃 뷰 추가
 @login_required
 def profile_view(request):
     if request.method == 'POST':
-        form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user)
-        if form.is_valid():
-            form.save()
+        user_form = UserUpdateForm(request.POST, instance=request.user)
+        profile_form = ProfileUpdateForm(
+            request.POST, 
+            request.FILES, 
+            instance=request.user.profile
+        )
+        if user_form.is_valid() and profile_form.is_valid():
+            user_form.save()
+            profile_form.save()
             return redirect('accounts:profile')
     else:
-        form = ProfileUpdateForm(instance=request.user)
+        user_form = UserUpdateForm(instance=request.user)
+        profile_form = ProfileUpdateForm(instance=request.user.profile)
     
     context = {
-        'form': form,
-        'orders': request.user.order_set.all()[:5],
+        'user_form': user_form,
+        'profile_form': profile_form,
+        'orders': request.user.orders.all()[:5],  # 수정된 부분: order_set -> orders
         'reviews': request.user.review_set.all()[:5]
     }
     return render(request, 'accounts/profile.html', context)
+
 
 
 @login_required

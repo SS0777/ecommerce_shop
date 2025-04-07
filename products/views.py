@@ -1,8 +1,11 @@
+from django.http import Http404
+from django.shortcuts import redirect
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 from .models import Product, Category
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView, DetailView, TemplateView
 from .models import Product
 from django.utils import timezone
 from datetime import timedelta
@@ -106,6 +109,34 @@ class NewProductsView(ListView):
             context['no_data_message'] = "현재 새로운 제품이 없습니다."
         return context
     
-def wishlist_view(request):
-    # 찜목록 뷰의 로직 구현
-    return render(request, 'products/wishlist.html')  # 해당 템플릿을 렌더링
+class WishlistView(LoginRequiredMixin,TemplateView):
+    template_name = 'products/wishlist.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        wishlist_items = user.wishlist.all()  # 로그인한 사용자의 찜 목록
+        context['wishlist_items'] = wishlist_items
+        return context
+
+@login_required
+def add_to_wishlist(request, product_id):
+    user = request.user
+    try:
+        product = Product.objects.get(id=product_id)
+    except Product.DoesNotExist:
+        raise Http404("상품을 찾을 수 없습니다.")
+    
+    user.wishlist.add(product)  # 찜 목록에 상품 추가
+    return redirect('products:wishlist')  # 찜 목록 페이지로 리디렉션
+
+@login_required
+def remove_from_wishlist(request, product_id):
+    user = request.user
+    try:
+        product = Product.objects.get(id=product_id)
+    except Product.DoesNotExist:
+        raise Http404("상품을 찾을 수 없습니다.")
+    
+    user.wishlist.remove(product)  # 찜 목록에서 상품 제거
+    return redirect('products:wishlist')  # 찜 목록 페이지로 리디렉션

@@ -30,7 +30,7 @@ class Order(models.Model):
         ('cancelled', '취소됨'),
     )
     
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='orders', on_delete=models.CASCADE)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     shipping_address = models.TextField()
     payment_method = models.CharField(max_length=50)

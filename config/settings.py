@@ -19,6 +19,9 @@ load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Media 파일 경로 설정
+MEDIA_URL = '/media/'  # 업로드된 파일에 접근할 때 사용하는 URL 경로
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # 업로드된 파일이 저장되는 실제 디렉토리 경로
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -53,6 +56,7 @@ INSTALLED_APPS = [
     'accounts.apps.AccountsConfig', 
     'reviews',
     'django_extensions',
+    'seller'
 ]
 
 AUTH_USER_MODEL = 'accounts.User'
